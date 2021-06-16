@@ -26,7 +26,8 @@ namespace WebApi.Controllers
         {
             try
             {
-                var movies = await _context.Movies.ToListAsync();
+                var movies = await _context.Movies.Include(d => d.Director)
+                                                  .ToListAsync();
 
                 if (!movies.Any())
                 {
@@ -34,6 +35,29 @@ namespace WebApi.Controllers
                 }
 
                 return Ok(movies);
+            }
+            catch (Exception ex)
+            {
+                return Conflict(ex.Message);
+            }
+        }
+
+        // POST api/movies
+        [HttpPost]
+        public async Task<ActionResult<Movie>> Post([FromBody] Movie movie)
+        {
+            try
+            {
+                var director = await _context.Directors.FirstOrDefaultAsync(director => director.Id == movie.DirectorId);
+
+                if (director == null) {
+                    return NotFound("Director not found.");
+                }
+
+                _context.Movies.Add(movie);
+                await _context.SaveChangesAsync();
+
+                return Ok(movie);
             }
             catch (Exception ex)
             {
