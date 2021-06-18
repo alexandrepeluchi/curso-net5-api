@@ -42,6 +42,28 @@ namespace WebApi.Controllers
             }
         }
 
+        // GET api/movies/5
+        [HttpGet("{id}")]
+        public async Task<ActionResult<Movie>> Get(int id)
+        {
+            try
+            {
+                var movie = await _context.Movies.Include(m => m.Director)
+                                                 .FirstOrDefaultAsync(movie => movie.Id == id);
+
+                if (movie == null)
+                {
+                    return NotFound("Movie not found.");
+                }
+
+                return Ok(movie);
+            }
+            catch (Exception ex)
+            {
+                return Conflict(ex.Message);
+            }
+        }
+
         // POST api/movies
         [HttpPost]
         public async Task<ActionResult<Movie>> Post([FromBody] Movie movie)
