@@ -86,5 +86,40 @@ namespace WebApi.Controllers
                 return Conflict(ex.Message);
             }
         }
+
+        // PUT api/movies/5
+        [HttpPut("{id}")]
+        public async Task<ActionResult<Movie>> Put(int id, [FromBody] Movie movie)
+        {
+            try
+            {
+                movie.Id = id;
+                _context.Movies.Update(movie);
+                await _context.SaveChangesAsync();
+
+                return Ok(movie);
+            }
+            catch (Exception ex)
+            {
+                return Conflict(ex.Message);
+            }
+        }
+
+        // DELETE api/movies/5
+        [HttpDelete("{id}")]
+        public ActionResult Delete(int id)
+        {
+            try
+            {
+                var movie = _context.Movies.FirstOrDefault(movie => movie.Id == id);
+                _context.Remove(movie);
+                _context.SaveChangesAsync();
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                return Conflict(ex.Message);
+            }
+        }
     }
 }
