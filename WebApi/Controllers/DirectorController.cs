@@ -1,4 +1,6 @@
+using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -19,24 +21,102 @@ namespace WebApi.Controllers
         }
 
         [HttpGet]
-        public async Task<List<Director>> Get()
-        {
-            return await _context.Directors.Include(m => m.Movies)
+        public async Task<ActionResult<IEnumerable<Director>>> Get()
+        {   
+            try
+            {
+                var directors = await _context.Directors.Include(d => d.Movies)
                                            .ToListAsync();
+
+                if (!directors.Any())
+                {
+                    return NotFound("Directors not found.");
+                }
+
+                return Ok(directors);
+            }
+            catch (Exception ex)
+            {
+                return Conflict(ex.Message);
+            }
         }
 
-        //POST api/diretores/
+        //GET api/directors/{id}
+        [HttpGet("{id}")]
+        public async Task<ActionResult<Director>> Get(long id)
+        {
+            try
+            {
+                var director = await _context.Directors.Include(m => m.Movies)
+                                                  .FirstOrDefaultAsync(director => director.Id == id);
+
+                if (director == null)
+                {
+                    return NotFound("Director not found.");
+                }
+
+                return Ok(director);
+            }
+            catch (Exception ex)
+            {
+                return Conflict(ex.Message);
+            }
+        }
+
+        //POST api/directors/
         [HttpPost]
         public async Task<ActionResult<Director>> Post([FromBody] Director director)
         {
-            if (director.Name == null || director.Name == "")
+            try
             {
-                return Conflict("Director can't be empty!");
-            }
-            _context.Directors.Add(director);
-            await _context.SaveChangesAsync();
+                if (director.Name == null || director.Name == "")
+                {
+                    return Conflict("Director can't be empty!");
+                }
+                _context.Directors.Add(director);
+                await _context.SaveChangesAsync();
 
-            return Ok(director);
+                return Ok(director);
+            }
+            catch (Exception ex)
+            {
+                return Conflict(ex.Message);
+            }
+        }
+
+        // Put api/directors/{id}
+        [HttpPut("{id}")]
+        public async Task<ActionResult<Director>> Put(long id, [FromBody] Director director)
+        {
+            try
+            {
+                director.Id = id;
+                _context.Directors.Update(director);
+                await _context.SaveChangesAsync();
+
+                return Ok(director);
+            }
+            catch (Exception ex)
+            {
+                return Conflict(ex.Message);
+            }
+        }
+
+        [HttpDelete("{id}")]
+        public async Task<ActionResult> Delete(long id)
+        {
+            try
+            {
+                var director = await _context.Directors.FirstOrDefaultAsync(director => director.Id == id);
+                _context.Directors.Remove(director);
+                await _context.SaveChangesAsync();
+
+                return Ok(director);
+            }
+            catch (Exception ex)
+            {
+                return Conflict(ex.Message);
+            }
         }
     }
 }
