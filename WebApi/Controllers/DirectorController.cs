@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using WebApi.Data;
+using WebApi.DTOs.Director;
 using WebApi.Models;
 
 namespace WebApi.Controllers
@@ -65,18 +66,22 @@ namespace WebApi.Controllers
 
         //POST api/directors/
         [HttpPost]
-        public async Task<ActionResult<Director>> Post([FromBody] Director director)
+        public async Task<ActionResult<DirectorOutputDTO>> Post([FromBody] DirectorInputDTO directorInputDTO)
         {
             try
             {
-                if (director.Name == null || director.Name == "")
+                if (directorInputDTO.Name == null || directorInputDTO.Name == "")
                 {
                     return Conflict("Director can't be empty!");
                 }
+
+                var director = new Director(directorInputDTO.Name);
                 _context.Directors.Add(director);
                 await _context.SaveChangesAsync();
 
-                return Ok(director);
+                var directorOutputDTO = new DirectorOutputDTO(director.Id, director.Name);
+
+                return Ok(directorOutputDTO);
             }
             catch (Exception ex)
             {
