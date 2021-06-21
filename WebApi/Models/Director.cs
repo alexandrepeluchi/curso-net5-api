@@ -12,5 +12,10 @@ namespace WebApi.Models
         {
             Movies = new List<Movie>();
         }
+
+        public Director(string name)
+        {
+            Name = name;
+        }
     }
 }
