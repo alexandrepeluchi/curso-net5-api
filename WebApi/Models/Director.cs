@@ -17,5 +17,11 @@ namespace WebApi.Models
         {
             Name = name;
         }
+
+        public Director(long id, string name)
+        {
+            Id = id;
+            Name = name;
+        }
     }
 }
