@@ -5,7 +5,8 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using WebApi.Data;
-using WebApi.DTOs.Director;
+using WebApi.DTOs.Director.POST;
+using WebApi.DTOs.Director.PUT;
 using WebApi.Models;
 
 namespace WebApi.Controllers
@@ -66,7 +67,7 @@ namespace WebApi.Controllers
 
         //POST api/directors/
         [HttpPost]
-        public async Task<ActionResult<DirectorOutputDTO>> Post([FromBody] DirectorInputDTO directorInputDTO)
+        public async Task<ActionResult<DirectorOutputPostDTO>> Post([FromBody] DirectorInputPostDTO directorInputDTO)
         {
             try
             {
@@ -79,7 +80,7 @@ namespace WebApi.Controllers
                 _context.Directors.Add(director);
                 await _context.SaveChangesAsync();
 
-                var directorOutputDTO = new DirectorOutputDTO(director.Id, director.Name);
+                var directorOutputDTO = new DirectorOutputPostDTO(director.Id, director.Name);
 
                 return Ok(directorOutputDTO);
             }
@@ -91,15 +92,19 @@ namespace WebApi.Controllers
 
         // Put api/directors/{id}
         [HttpPut("{id}")]
-        public async Task<ActionResult<Director>> Put(long id, [FromBody] Director director)
+        public async Task<ActionResult<DirectorOutputPutDTO>> Put(long id, [FromBody] DirectorInputPutDTO directorInputPutDTO)
         {
             try
             {
+                var director = new Director(directorInputPutDTO.Name);
                 director.Id = id;
+
                 _context.Directors.Update(director);
                 await _context.SaveChangesAsync();
 
-                return Ok(director);
+                var directorOutputPutDTO = new DirectorOutputPutDTO(director.Id, director.Name);
+
+                return Ok(directorOutputPutDTO);
             }
             catch (Exception ex)
             {
