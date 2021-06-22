@@ -1,11 +1,11 @@
-namespace WebApi.DTOs.Director
+namespace WebApi.DTOs.Director.POST
 {
-    public class DirectorOutputDTO
+    public class DirectorOutputPostDTO
     {
         public long Id { get; set; }
         public string Name { get; set; }
 
-        public DirectorOutputDTO(long id, string name)
+        public DirectorOutputPostDTO(long id, string name)
         {
             Id = id;
             Name = name;
