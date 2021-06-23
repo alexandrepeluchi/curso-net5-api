@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using WebApi.Data;
+using WebApi.DTOs.Directors.GET;
 using WebApi.DTOs.Directors.POST;
 using WebApi.DTOs.Directors.PUT;
 using WebApi.Models;
@@ -34,7 +35,7 @@ namespace WebApi.Controllers
                     return NotFound("Directors not found.");
                 }
 
-                var directorsDTO = directors.Select(d => DirectorOutputPostDTO.ToDirectorDTOMap(d)).ToList();
+                var directorsDTO = directors.Select(d => DirectorOutputGetDTO.ToDirectorDTOMap(d)).ToList();
 
                 return Ok(directorsDTO);
             }
@@ -58,7 +59,7 @@ namespace WebApi.Controllers
                     return NotFound("Director not found.");
                 }
 
-                var directorOutputDTO = new DirectorOutputPostDTO(director.Id, director.Name);
+                var directorOutputDTO = new DirectorOutputGetDTO(director.Id, director.Name);
 
                 return Ok(directorOutputDTO);
             }

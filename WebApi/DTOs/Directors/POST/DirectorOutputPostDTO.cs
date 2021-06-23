@@ -12,10 +12,5 @@ namespace WebApi.DTOs.Directors.POST
             Id = id;
             Name = name;
         }
-
-        public static DirectorOutputPostDTO ToDirectorDTOMap(Director director)
-        {
-            return new DirectorOutputPostDTO(director.Id, director.Name);
-        }
     }
 }
