@@ -1,12 +1,11 @@
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using WebApi.Data;
-using WebApi.DTOs.Director.POST;
-using WebApi.DTOs.Director.PUT;
+using WebApi.DTOs.Directors.POST;
+using WebApi.DTOs.Directors.PUT;
 using WebApi.Models;
 
 namespace WebApi.Controllers
@@ -28,14 +27,16 @@ namespace WebApi.Controllers
             try
             {
                 var directors = await _context.Directors.Include(d => d.Movies)
-                                           .ToListAsync();
+                                                        .ToListAsync();
 
                 if (!directors.Any())
                 {
                     return NotFound("Directors not found.");
                 }
 
-                return Ok(directors);
+                var directorsDTO = directors.Select(d => DirectorOutputPostDTO.ToDirectorDTOMap(d)).ToList();
+
+                return Ok(directorsDTO);
             }
             catch (Exception ex)
             {
@@ -50,7 +51,7 @@ namespace WebApi.Controllers
             try
             {
                 var director = await _context.Directors.Include(m => m.Movies)
-                                                  .FirstOrDefaultAsync(director => director.Id == id);
+                                                       .FirstOrDefaultAsync(director => director.Id == id);
 
                 if (director == null)
                 {
