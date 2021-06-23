@@ -1,4 +1,4 @@
-namespace WebApi.DTOs.Director.PUT
+namespace WebApi.DTOs.Directors.PUT
 {
     public class DirectorInputPutDTO
     {

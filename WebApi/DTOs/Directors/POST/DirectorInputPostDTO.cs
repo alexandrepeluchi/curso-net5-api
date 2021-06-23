@@ -1,4 +1,4 @@
-namespace WebApi.DTOs.Director.POST
+namespace WebApi.DTOs.Directors.POST
 {
     public class DirectorInputPostDTO
     {
