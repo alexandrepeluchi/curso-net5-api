@@ -23,7 +23,7 @@ namespace WebApi.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Director>>> Get()
+        public async Task<ActionResult> Get()
         {   
             try
             {
@@ -45,7 +45,7 @@ namespace WebApi.Controllers
 
         //GET api/directors/{id}
         [HttpGet("{id}")]
-        public async Task<ActionResult<Director>> Get(long id)
+        public async Task<ActionResult> Get(long id)
         {
             try
             {
@@ -57,7 +57,9 @@ namespace WebApi.Controllers
                     return NotFound("Director not found.");
                 }
 
-                return Ok(director);
+                var directorOutputDTO = new DirectorOutputPostDTO(director.Id, director.Name);
+
+                return Ok(directorOutputDTO);
             }
             catch (Exception ex)
             {
@@ -67,7 +69,7 @@ namespace WebApi.Controllers
 
         //POST api/directors/
         [HttpPost]
-        public async Task<ActionResult<DirectorOutputPostDTO>> Post([FromBody] DirectorInputPostDTO directorInputDTO)
+        public async Task<ActionResult> Post([FromBody] DirectorInputPostDTO directorInputDTO)
         {
             try
             {
@@ -92,7 +94,7 @@ namespace WebApi.Controllers
 
         // Put api/directors/{id}
         [HttpPut("{id}")]
-        public async Task<ActionResult<DirectorOutputPutDTO>> Put(long id, [FromBody] DirectorInputPutDTO directorInputPutDTO)
+        public async Task<ActionResult> Put(long id, [FromBody] DirectorInputPutDTO directorInputPutDTO)
         {
             try
             {
@@ -121,7 +123,9 @@ namespace WebApi.Controllers
                 _context.Directors.Remove(director);
                 await _context.SaveChangesAsync();
 
-                return Ok(director);
+                var directorOutputPutDTO = new DirectorOutputPutDTO(director.Id, director.Name);
+
+                return Ok(directorOutputPutDTO);
             }
             catch (Exception ex)
             {
