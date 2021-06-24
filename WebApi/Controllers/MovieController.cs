@@ -22,7 +22,7 @@ namespace WebApi.Controllers
 
         // GET api/movies
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Movie>>> Get()
+        public async Task<ActionResult> Get()
         {
             try
             {
@@ -44,7 +44,7 @@ namespace WebApi.Controllers
 
         // GET api/movies/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<Movie>> Get(int id)
+        public async Task<ActionResult> Get(int id)
         {
             try
             {
@@ -66,7 +66,7 @@ namespace WebApi.Controllers
 
         // POST api/movies
         [HttpPost]
-        public async Task<ActionResult<Movie>> Post([FromBody] Movie movie)
+        public async Task<ActionResult> Post([FromBody] Movie movie)
         {
             try
             {
@@ -89,7 +89,7 @@ namespace WebApi.Controllers
 
         // PUT api/movies/5
         [HttpPut("{id}")]
-        public async Task<ActionResult<Movie>> Put(int id, [FromBody] Movie movie)
+        public async Task<ActionResult> Put(int id, [FromBody] Movie movie)
         {
             try
             {
@@ -107,13 +107,13 @@ namespace WebApi.Controllers
 
         // DELETE api/movies/5
         [HttpDelete("{id}")]
-        public ActionResult Delete(int id)
+        public async Task<ActionResult> Delete(int id)
         {
             try
             {
                 var movie = _context.Movies.FirstOrDefault(movie => movie.Id == id);
                 _context.Remove(movie);
-                _context.SaveChangesAsync();
+                await _context.SaveChangesAsync();
                 return Ok();
             }
             catch (Exception ex)
