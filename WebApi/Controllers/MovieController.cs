@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using WebApi.Data;
+using WebApi.DTOs.Movies.GET;
 using WebApi.Models;
 
 namespace WebApi.Controllers
@@ -34,7 +35,9 @@ namespace WebApi.Controllers
                     return NotFound("Movies not found.");
                 }
 
-                return Ok(movies);
+                var moviesDTO = movies.Select(d => MovieOutputGetDTO.ToMovieDTOMap(d)).ToList();
+
+                return Ok(moviesDTO);
             }
             catch (Exception ex)
             {
@@ -56,7 +59,13 @@ namespace WebApi.Controllers
                     return NotFound("Movie not found.");
                 }
 
-                return Ok(movie);
+                var movieOutputDTO = new MovieOutputGetDTO(movie.Id,
+                                                           movie.Title,
+                                                           movie.Year,
+                                                           movie.Genre,
+                                                           movie.DirectorId);
+
+                return Ok(movieOutputDTO);
             }
             catch (Exception ex)
             {
