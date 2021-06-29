@@ -6,6 +6,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using WebApi.Data;
 using WebApi.DTOs.Movies.GET;
+using WebApi.DTOs.Movies.POST;
+using WebApi.DTOs.Movies.PUT;
 using WebApi.Models;
 
 namespace WebApi.Controllers
@@ -75,20 +77,31 @@ namespace WebApi.Controllers
 
         // POST api/movies
         [HttpPost]
-        public async Task<ActionResult> Post([FromBody] Movie movie)
+        public async Task<ActionResult> Post([FromBody] MovieInputPostDTO movieInputPostDTO)
         {
             try
             {
-                var director = await _context.Directors.FirstOrDefaultAsync(director => director.Id == movie.DirectorId);
+                var director = await _context.Directors.FirstOrDefaultAsync(director => director.Id == movieInputPostDTO.DirectorId);
 
                 if (director == null) {
                     return NotFound("Director not found.");
                 }
 
+                var movie = new Movie(movieInputPostDTO.Title,
+                                      movieInputPostDTO.Year,
+                                      movieInputPostDTO.Genre,
+                                      movieInputPostDTO.DirectorId);
+
                 _context.Movies.Add(movie);
                 await _context.SaveChangesAsync();
 
-                return Ok(movie);
+                var movieOutputPostDTO = new MovieOutputPostDTO(movie.Id,
+                                                                movie.Title,
+                                                                movie.Year,
+                                                                movie.Genre,
+                                                                movie.DirectorId);
+
+                return Ok(movieOutputPostDTO);
             }
             catch (Exception ex)
             {
@@ -98,15 +111,28 @@ namespace WebApi.Controllers
 
         // PUT api/movies/5
         [HttpPut("{id}")]
-        public async Task<ActionResult> Put(int id, [FromBody] Movie movie)
+        public async Task<ActionResult> Put(int id, [FromBody] MovieInputPutDTO movieInputPutDTO)
         {
             try
             {
-                movie.Id = id;
+                movieInputPutDTO.Id = id;
+
+                var movie = new Movie(movieInputPutDTO.Id,
+                                      movieInputPutDTO.Title,
+                                      movieInputPutDTO.Year,
+                                      movieInputPutDTO.Genre,
+                                      movieInputPutDTO.DirectorId);
+
                 _context.Movies.Update(movie);
                 await _context.SaveChangesAsync();
 
-                return Ok(movie);
+                var movieOutputPutDTO = new MovieOutputPutDTO(movie.Id,
+                                                              movie.Title,
+                                                              movie.Year,
+                                                              movie.Genre,
+                                                              movie.DirectorId);
+
+                return Ok(movieOutputPutDTO);
             }
             catch (Exception ex)
             {
