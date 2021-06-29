@@ -13,5 +13,22 @@ namespace WebApi.Models
         {
             Title = title;
         }
+
+        public Movie(int id, string title, string year, string genre, long directorId)
+        {
+            Id = id;
+            Title = title;
+            Year = year;
+            Genre = genre;
+            DirectorId = directorId;
+        }
+
+        public Movie(string title, string year, string genre, long directorId)
+        {
+            Title = title;
+            Year = year;
+            Genre = genre;
+            DirectorId = directorId;
+        }
     }
 }
