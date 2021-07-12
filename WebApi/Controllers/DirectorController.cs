@@ -25,114 +25,79 @@ namespace WebApi.Controllers
         [HttpGet]
         public async Task<ActionResult> Get()
         {   
-            try
+            var directors = await _context.Directors.Include(d => d.Movies)
+                                                    .ToListAsync();
+
+            if (!directors.Any())
             {
-                var directors = await _context.Directors.Include(d => d.Movies)
-                                                        .ToListAsync();
-
-                if (!directors.Any())
-                {
-                    return NotFound("Directors not found.");
-                }
-
-                var directorsDTO = directors.Select(d => DirectorOutputGetDTO.ToDirectorDTOMap(d)).ToList();
-
-                return Ok(directorsDTO);
+                return NotFound("There are no registered Directors.");
             }
-            catch (Exception ex)
-            {
-                return Conflict(ex.Message);
-            }
+
+            var directorsDTO = directors.Select(d => DirectorOutputGetDTO.ToDirectorDTOMap(d)).ToList();
+
+            return Ok(directorsDTO);
         }
 
         //GET api/directors/{id}
         [HttpGet("{id}")]
         public async Task<ActionResult> Get(long id)
         {
-            try
+            var director = await _context.Directors.Include(m => m.Movies)
+                                                    .FirstOrDefaultAsync(director => director.Id == id);
+
+            if (director == null)
             {
-                var director = await _context.Directors.Include(m => m.Movies)
-                                                       .FirstOrDefaultAsync(director => director.Id == id);
-
-                if (director == null)
-                {
-                    return NotFound("Director not found.");
-                }
-
-                var directorOutputDTO = new DirectorOutputGetDTO(director.Id, director.Name);
-
-                return Ok(directorOutputDTO);
+                return NotFound("Director not found.");
             }
-            catch (Exception ex)
-            {
-                return Conflict(ex.Message);
-            }
+
+            var directorOutputDTO = new DirectorOutputGetDTO(director.Id, director.Name);
+
+            return Ok(directorOutputDTO);
         }
 
         //POST api/directors/
         [HttpPost]
         public async Task<ActionResult> Post([FromBody] DirectorInputPostDTO directorInputDTO)
         {
-            try
+            if (directorInputDTO.Name == null || directorInputDTO.Name == "")
             {
-                if (directorInputDTO.Name == null || directorInputDTO.Name == "")
-                {
-                    return Conflict("Director can't be empty!");
-                }
-
-                var director = new Director(directorInputDTO.Name);
-                _context.Directors.Add(director);
-                await _context.SaveChangesAsync();
-
-                var directorOutputDTO = new DirectorOutputPostDTO(director.Id, director.Name);
-
-                return Ok(directorOutputDTO);
+                return Conflict("Director can't be empty!");
             }
-            catch (Exception ex)
-            {
-                return Conflict(ex.Message);
-            }
+
+            var director = new Director(directorInputDTO.Name);
+            _context.Directors.Add(director);
+            await _context.SaveChangesAsync();
+
+            var directorOutputDTO = new DirectorOutputPostDTO(director.Id, director.Name);
+
+            return Ok(directorOutputDTO);
         }
 
         // Put api/directors/{id}
         [HttpPut("{id}")]
         public async Task<ActionResult> Put(long id, [FromBody] DirectorInputPutDTO directorInputPutDTO)
         {
-            try
-            {
-                var director = new Director(directorInputPutDTO.Name);
-                director.Id = id;
+            var director = new Director(directorInputPutDTO.Name);
+            director.Id = id;
 
-                _context.Directors.Update(director);
-                await _context.SaveChangesAsync();
+            _context.Directors.Update(director);
+            await _context.SaveChangesAsync();
 
-                var directorOutputPutDTO = new DirectorOutputPutDTO(director.Id, director.Name);
+            var directorOutputPutDTO = new DirectorOutputPutDTO(director.Id, director.Name);
 
-                return Ok(directorOutputPutDTO);
-            }
-            catch (Exception ex)
-            {
-                return Conflict(ex.Message);
-            }
+            return Ok(directorOutputPutDTO);
         }
 
         [HttpDelete("{id}")]
         public async Task<ActionResult> Delete(long id)
         {
-            try
-            {
-                var director = await _context.Directors.FirstOrDefaultAsync(director => director.Id == id);
-                _context.Directors.Remove(director);
-                await _context.SaveChangesAsync();
+            var director = await _context.Directors.FirstOrDefaultAsync(director => director.Id == id);
+            _context.Directors.Remove(director);
+            await _context.SaveChangesAsync();
 
-                var directorOutputPutDTO = new DirectorOutputPutDTO(director.Id, director.Name);
+            var directorOutputPutDTO = new DirectorOutputPutDTO(director.Id, director.Name);
 
-                return Ok(directorOutputPutDTO);
-            }
-            catch (Exception ex)
-            {
-                return Conflict(ex.Message);
-            }
+            return Ok(directorOutputPutDTO);
         }
     }
 }
