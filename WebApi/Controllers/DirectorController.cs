@@ -55,16 +55,29 @@ namespace WebApi.Controllers
             return Ok(directorOutputDTO);
         }
 
-        //POST api/directors/
+        /// <summary>
+        /// Cria um diretor
+        /// </summary>
+        /// <remarks>
+        /// Sample request:
+        ///
+        ///     POST /diretor
+        ///     {
+        ///        "nome": "Martin Scorsese",
+        ///     }
+        ///
+        /// </remarks>
+        /// <returns>O diretor criado</returns>
+        /// <response code="200">Diretor foi criado com sucesso</response>
         [HttpPost]
-        public async Task<ActionResult> Post([FromBody] DirectorInputPostDTO directorInputDTO)
+        public async Task<ActionResult> Post([FromBody] DirectorInputPostDTO directorInputPostDTO)
         {
-            if (directorInputDTO.Name == null || directorInputDTO.Name == "")
+            if (directorInputPostDTO.Name == null || directorInputPostDTO.Name == "")
             {
                 return Conflict("Director can't be empty!");
             }
 
-            var director = new Director(directorInputDTO.Name);
+            var director = new Director(directorInputPostDTO.Name);
             _context.Directors.Add(director);
             await _context.SaveChangesAsync();
 
