@@ -8,6 +8,7 @@ using WebApi.DTOs.Directors.GET;
 using WebApi.DTOs.Directors.POST;
 using WebApi.DTOs.Directors.PUT;
 using WebApi.Models;
+using WebApi.Services;
 
 namespace WebApi.Controllers
 {
@@ -16,23 +17,19 @@ namespace WebApi.Controllers
     public class DirectorController : ControllerBase
     {
         private readonly Context _context;
+        private readonly IDirectorService _directorService;
 
-        public DirectorController(Context context)
+        public DirectorController(Context context,
+                                  IDirectorService directorService)
         {
             _context = context;
+            _directorService = directorService;
         }
 
         [HttpGet]
         public async Task<ActionResult> Get()
         {   
-            var directors = await _context.Directors.Include(d => d.Movies)
-                                                    .ToListAsync();
-
-            if (!directors.Any())
-            {
-                return NotFound("There are no registered Directors.");
-            }
-
+            var directors = await _directorService.GetAll();
             var directorsDTO = directors.Select(d => DirectorOutputGetDTO.ToDirectorDTOMap(d)).ToList();
 
             return Ok(directorsDTO);
