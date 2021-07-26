@@ -13,7 +13,7 @@ using WebApi.Services;
 namespace WebApi.Controllers
 {
     [ApiController]
-    [Route("[controller]")]
+    [Route("director")]
     public class DirectorController : ControllerBase
     {
         private readonly Context _context;
@@ -25,7 +25,15 @@ namespace WebApi.Controllers
             _context = context;
             _directorService = directorService;
         }
-
+        
+        /// <summary>
+        /// Busca todos os diretores
+        /// </summary>
+        /// <response code="200">Sucesso ao buscar todos os diretores.</response> 
+        /// <response code="403">Você não tem permissão de acesso nesse servidor.</response>
+        /// <response code="404">Não existe diretores cadastrados.</response>
+        /// <response code="409">A solicitação atual conflitou com o recurso que está no servidor</response>
+        /// <response code="500">A solicitação não foi concluída devido a um erro interno no lado do servidor.</response>
         [HttpGet]
         public async Task<ActionResult> Get()
         {   
@@ -35,7 +43,14 @@ namespace WebApi.Controllers
             return Ok(directorsDTO);
         }
 
-        //GET api/directors/{id}
+        /// <summary>
+        /// Busca um diretor por Id
+        /// </summary>
+        /// <response code="200">Sucesso ao retornar o diretor por Id.</response> 
+        /// <response code="403">Você não tem permissão de acesso nesse servidor.</response>
+        /// <response code="404">Não existe diretor cadastrado com o Id informado.</response>
+        /// <response code="409">A solicitação atual conflitou com o recurso que está no servidor</response>
+        /// <response code="500">A solicitação não foi concluída devido a um erro interno no lado do servidor.</response>
         [HttpGet("{id}")]
         public async Task<ActionResult> Get(long id)
         {
@@ -53,19 +68,24 @@ namespace WebApi.Controllers
         }
 
         /// <summary>
-        /// Cria um diretor
+        /// Cria um director
         /// </summary>
         /// <remarks>
         /// Sample request:
         ///
         ///     POST /diretor
         ///     {
-        ///        "nome": "Martin Scorsese",
+        ///        "name": "Martin Scorsese",
         ///     }
         ///
         /// </remarks>
         /// <returns>O diretor criado</returns>
-        /// <response code="200">Diretor foi criado com sucesso</response>
+        /// <response code="200">Sucesso ao criar um diretor.</response>
+        /// <response code="201">Retorna o diretor recém criado.</response>
+        /// <response code="400">Se a requisição tiver valor null.</response> 
+        /// <response code="403">Você não tem permissão de acesso nesse servidor.</response>
+        /// <response code="409">Algum campo com dados inválidos ou ja existe um diretor com este nome.</response>
+        /// <response code="500">A solicitação não foi concluída devido a um erro interno no lado do servidor.</response>
         [HttpPost]
         public async Task<ActionResult> Post([FromBody] DirectorInputPostDTO directorInputPostDTO)
         {
@@ -83,7 +103,26 @@ namespace WebApi.Controllers
             return Ok(directorOutputDTO);
         }
 
-        // Put api/directors/{id}
+        /// <summary>
+        /// Atualiza um diretor
+        /// </summary>
+        /// <remarks>
+        /// Sample request:
+        ///
+        ///     PUT /director
+        ///     {
+        ///        "id": 1,
+        ///        "name": "Martin Scorsese",
+        ///     }
+        ///
+        /// </remarks>
+        /// <returns>O diretor atualizado</returns>
+        /// <response code="200">Sucesso ao atualizar um diretor.</response>
+        /// <response code="201">Retorna o diretor recém atualizado.</response>
+        /// <response code="400">Se a requisição tiver valor null.</response> 
+        /// <response code="403">Você não tem permissão de acesso nesse servidor.</response>
+        /// <response code="409">Algum campo com dados inválidos ou ja existe um diretor com este nome.</response>
+        /// <response code="500">A solicitação não foi concluída devido a um erro interno no lado do servidor.</response>
         [HttpPut("{id}")]
         public async Task<ActionResult> Put(long id, [FromBody] DirectorInputPutDTO directorInputPutDTO)
         {
@@ -98,6 +137,13 @@ namespace WebApi.Controllers
             return Ok(directorOutputPutDTO);
         }
 
+        /// <summary>
+        /// Deleta um diretor
+        /// </summary>
+        /// <response code="200">Sucesso ao deletar o diretor por Id.</response> 
+        /// <response code="403">Você não tem permissão de acesso nesse servidor.</response>
+        /// <response code="404">Não existe diretor cadastrado com o Id informado.</response>
+        /// <response code="500">A solicitação não foi concluída devido a um erro interno no lado do servidor.</response>
         [HttpDelete("{id}")]
         public async Task<ActionResult> Delete(long id)
         {

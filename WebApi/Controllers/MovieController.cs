@@ -13,7 +13,7 @@ using WebApi.Models;
 namespace WebApi.Controllers
 {
     [ApiController]
-    [Route("[controller]")]
+    [Route("movie")]
     public class MovieController : ControllerBase
     {
         private readonly Context _context;
@@ -23,7 +23,14 @@ namespace WebApi.Controllers
             _context = context;
         }
 
-        // GET api/movies
+        /// <summary>
+        /// Busca todos os filmes
+        /// </summary>
+        /// <response code="200">Sucesso ao buscar todos os filmes.</response> 
+        /// <response code="403">Você não tem permissão de acesso nesse servidor.</response>
+        /// <response code="404">Não existe filmes cadastrados.</response>
+        /// <response code="409">A solicitação atual conflitou com o recurso que está no servidor</response>
+        /// <response code="500">A solicitação não foi concluída devido a um erro interno no lado do servidor.</response>
         [HttpGet]
         public async Task<ActionResult> Get()
         {
@@ -41,7 +48,14 @@ namespace WebApi.Controllers
             return Ok(moviesDTO);
         }
 
-        // GET api/movies/5
+        /// <summary>
+        /// Busca um filme por Id
+        /// </summary>
+        /// <response code="200">Sucesso ao retornar o filme por Id.</response> 
+        /// <response code="403">Você não tem permissão de acesso nesse servidor.</response>
+        /// <response code="404">Não existe filme cadastrado com o Id informado.</response>
+        /// <response code="409">A solicitação atual conflitou com o recurso que está no servidor</response>
+        /// <response code="500">A solicitação não foi concluída devido a um erro interno no lado do servidor.</response>
         [HttpGet("{id}")]
         public async Task<ActionResult> Get(int id)
         {
@@ -62,7 +76,28 @@ namespace WebApi.Controllers
             return Ok(movieOutputDTO);
         }
 
-        // POST api/movies
+        /// <summary>
+        /// Cria um filme
+        /// </summary>
+        /// <remarks>
+        /// Sample request:
+        ///
+        ///     POST /movie
+        ///     {
+        ///        "title": "Pulp Fiction",
+        ///        "year": "1994",
+        ///        "genre": "Drama",
+        ///        "directorId": 1,
+        ///     }
+        ///
+        /// </remarks>
+        /// <returns>O filme criado</returns>
+        /// <response code="200">Sucesso ao criar um filme.</response>
+        /// <response code="201">Retorna o filme recém criado.</response>
+        /// <response code="400">Se a requisição tiver valor null.</response> 
+        /// <response code="403">Você não tem permissão de acesso nesse servidor.</response>
+        /// <response code="409">Algum campo com dados inválidos ou ja existe um filme com este nome.</response>
+        /// <response code="500">A solicitação não foi concluída devido a um erro interno no lado do servidor.</response>
         [HttpPost]
         public async Task<ActionResult> Post([FromBody] MovieInputPostDTO movieInputPostDTO)
         {
@@ -90,7 +125,29 @@ namespace WebApi.Controllers
             return Ok(movieOutputPostDTO);
         }
 
-        // PUT api/movies/5
+        /// <summary>
+        /// Atualiza um filme
+        /// </summary>
+        /// <remarks>
+        /// Sample request:
+        ///
+        ///     PUT /movie
+        ///     {
+        ///        "id": 1,
+        ///        "title": "Pulp Fiction",
+        ///        "year": "1994",
+        ///        "genre": "Drama",
+        ///        "directorId": 1,
+        ///     }
+        ///
+        /// </remarks>
+        /// <returns>O filme atualizado</returns>
+        /// <response code="200">Sucesso ao atualizar um filme.</response>
+        /// <response code="201">Retorna o filme recém atualizado.</response>
+        /// <response code="400">Se a requisição tiver valor null.</response> 
+        /// <response code="403">Você não tem permissão de acesso nesse servidor.</response>
+        /// <response code="409">Algum campo com dados inválidos ou ja existe um filme com este nome.</response>
+        /// <response code="500">A solicitação não foi concluída devido a um erro interno no lado do servidor.</response>
         [HttpPut("{id}")]
         public async Task<ActionResult> Put(int id, [FromBody] MovieInputPutDTO movieInputPutDTO)
         {
@@ -119,7 +176,13 @@ namespace WebApi.Controllers
             return Ok(movieOutputPutDTO);
         }
 
-        // DELETE api/movies/5
+        /// <summary>
+        /// Deleta um filme
+        /// </summary>
+        /// <response code="200">Sucesso ao deletar o filme por Id.</response> 
+        /// <response code="403">Você não tem permissão de acesso nesse servidor.</response>
+        /// <response code="404">Não existe filme cadastrado com o Id informado.</response>
+        /// <response code="500">A solicitação não foi concluída devido a um erro interno no lado do servidor.</response>
         [HttpDelete("{id}")]
         public async Task<ActionResult> Delete(int id)
         {
