@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -9,6 +10,7 @@ using WebApi.DTOs.Movies.GET;
 using WebApi.DTOs.Movies.POST;
 using WebApi.DTOs.Movies.PUT;
 using WebApi.Models;
+using WebApi.Services.Movies;
 
 namespace WebApi.Controllers
 {
@@ -17,10 +19,14 @@ namespace WebApi.Controllers
     public class MovieController : ControllerBase
     {
         private readonly Context _context;
+        private readonly IMovieService _movieService;
 
-        public MovieController(Context context)
+
+        public MovieController(Context context,
+                               IMovieService movieService)
         {
             _context = context;
+            _movieService = movieService;
         }
 
         /// <summary>
@@ -32,20 +38,9 @@ namespace WebApi.Controllers
         /// <response code="409">A solicitação atual conflitou com o recurso que está no servidor</response>
         /// <response code="500">A solicitação não foi concluída devido a um erro interno no lado do servidor.</response>
         [HttpGet]
-        public async Task<ActionResult> Get()
+        public async Task<ActionResult<MoviesListOutputGetAllDTO>> Get(CancellationToken cancellationToken, int limit = 5, int page = 1) 
         {
-            
-            var movies = await _context.Movies.Include(d => d.Director)
-                                              .ToListAsync();
-
-            if (!movies.Any())
-            {
-                return NotFound("Movies not found.");
-            }
-
-            var moviesDTO = movies.Select(d => MovieOutputGetDTO.ToMovieDTOMap(d)).ToList();
-
-            return Ok(moviesDTO);
+            return await _movieService.GetByPageAsync(limit, page, cancellationToken);        
         }
 
         /// <summary>
@@ -59,13 +54,7 @@ namespace WebApi.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult> Get(int id)
         {
-            var movie = await _context.Movies.Include(m => m.Director)
-                                                .FirstOrDefaultAsync(movie => movie.Id == id);
-
-            if (movie == null)
-            {
-                return NotFound("There are no registered Movies.");
-            }
+            var movie = await _movieService.GetById(id);
 
             var movieOutputDTO = new MovieOutputGetDTO(movie.Id,
                                                         movie.Title,
@@ -101,20 +90,7 @@ namespace WebApi.Controllers
         [HttpPost]
         public async Task<ActionResult> Post([FromBody] MovieInputPostDTO movieInputPostDTO)
         {
-            var director = await _context.Directors.FirstOrDefaultAsync(director => director.Id == movieInputPostDTO.DirectorId);
-
-            if (director == null) 
-            {
-                return NotFound("Director not found.");
-            }
-
-            var movie = new Movie(movieInputPostDTO.Title,
-                                    movieInputPostDTO.Year,
-                                    movieInputPostDTO.Genre,
-                                    movieInputPostDTO.DirectorId);
-
-            _context.Movies.Add(movie);
-            await _context.SaveChangesAsync();
+            var movie = await _movieService.Create(new Movie(movieInputPostDTO.Title, movieInputPostDTO.DirectorId));
 
             var movieOutputPostDTO = new MovieOutputPostDTO(movie.Id,
                                                             movie.Title,
@@ -151,27 +127,19 @@ namespace WebApi.Controllers
         [HttpPut("{id}")]
         public async Task<ActionResult> Put(int id, [FromBody] MovieInputPutDTO movieInputPutDTO)
         {
-            movieInputPutDTO.Id = id;
+            var movie = new Movie(id,
+                                  movieInputPutDTO.Title,
+                                  movieInputPutDTO.Year,
+                                  movieInputPutDTO.Genre,
+                                  movieInputPutDTO.DirectorId);
 
-            var movie = new Movie(movieInputPutDTO.Id,
-                                    movieInputPutDTO.Title,
-                                    movieInputPutDTO.Year,
-                                    movieInputPutDTO.Genre,
-                                    movieInputPutDTO.DirectorId);
-
-            if (movieInputPutDTO.DirectorId == 0) 
-            {
-                return NotFound("Director Id is invalid.");
-            }
-
-            _context.Movies.Update(movie);
-            await _context.SaveChangesAsync();
+            await _movieService.Update(movie, movie.Id);
 
             var movieOutputPutDTO = new MovieOutputPutDTO(movie.Id,
-                                                            movie.Title,
-                                                            movie.Year,
-                                                            movie.Genre,
-                                                            movie.DirectorId);
+                                                          movie.Title,
+                                                          movie.Year,
+                                                          movie.Genre,
+                                                          movie.DirectorId);
 
             return Ok(movieOutputPutDTO);
         }
@@ -186,9 +154,8 @@ namespace WebApi.Controllers
         [HttpDelete("{id}")]
         public async Task<ActionResult> Delete(int id)
         {
-            var movie = _context.Movies.FirstOrDefault(movie => movie.Id == id);
-            _context.Remove(movie);
-            await _context.SaveChangesAsync();
+            await _movieService.Delete(id);
+
             return Ok();
         }
     }
