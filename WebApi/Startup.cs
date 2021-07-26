@@ -17,6 +17,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
 using WebApi.Data;
 using WebApi.Services;
+using WebApi.Services.Movies;
 
 namespace WebApi
 {
@@ -54,6 +55,7 @@ namespace WebApi
             services.AddDbContext<Context>(options => options.UseSqlite("Data Source=myapp.db"));
 
             services.AddScoped<IDirectorService, DirectorService>();
+            services.AddScoped<IMovieService, MovieService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
